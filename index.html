@@ -3,475 +3,477 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Splash Finder</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fraunces:ital,wght@0,300;0,700;1,300;1,700&display=swap" rel="stylesheet">
+<meta name="description" content="Splashfinders — Find free local splash pads in Will, Kendall, and Grundy Counties, Illinois.">
+<title>Splashfinders – Local Splash Pads</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --sky: #e0f4ff; --water: #3ab7e8; --deep: #1a6fa3; --splash: #00c2e0;
-    --foam: #f0fbff; --sun: #ffcd3c; --grass: #4caf7d; --coral: #ff6b6b;
-    --text: #1a2b3c; --muted: #6b8ca8; --card: #ffffff; --border: #d4eef9; --tag-bg: #e0f4ff;
+    --green:#5aab4a; --green-dark:#3d7a30; --green-light:#e8f5e4;
+    --orange:#f5a623; --orange-light:#fff5e0;
+    --text:#1a2b1a; --muted:#6b8c6b;
+    --card:#ffffff; --border:#d4ecd4; --foam:#f4fcf4;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { font-family: 'Nunito', sans-serif; background: var(--foam); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-  .header { background: linear-gradient(160deg, #1a6fa3 0%, #3ab7e8 60%, #00c2e0 100%); padding: 20px 20px 28px; position: relative; overflow: hidden; }
-  .header::before { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 28px; background: var(--foam); border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
-  .header-wave { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.08; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.3) 10px, rgba(255,255,255,0.3) 20px); }
-  .logo-row { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
-  .logo-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; backdrop-filter: blur(4px); border: 1.5px solid rgba(255,255,255,0.4); }
-  .logo-text { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
-  .logo-text span { font-style: italic; font-weight: 300; }
-  .tagline { color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 600; margin-top: 4px; letter-spacing: 0.3px; position: relative; z-index: 1; }
-  .ripple-bg { position: absolute; bottom: 20px; right: -30px; width: 180px; height: 180px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); animation: ripple 3s ease-in-out infinite; }
-  .ripple-bg:nth-child(2) { width: 120px; height: 120px; bottom: 30px; right: -10px; animation-delay: 0.8s; }
-  .ripple-bg:nth-child(3) { width: 60px; height: 60px; bottom: 45px; right: 30px; animation-delay: 1.6s; }
-  @keyframes ripple { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.08); opacity: 0.2; } }
-  .controls { padding: 16px 16px 8px; }
-  .search-box { display: flex; align-items: center; background: #fff; border: 2px solid var(--border); border-radius: 14px; padding: 10px 14px; gap: 8px; box-shadow: 0 2px 12px rgba(58,183,232,0.1); margin-bottom: 12px; }
-  .search-box input { border: none; outline: none; font-family: 'Nunito', sans-serif; font-size: 15px; color: var(--text); width: 100%; background: transparent; }
-  .search-box input::placeholder { color: var(--muted); }
-  .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-  .filter-row::-webkit-scrollbar { display: none; }
-  .filter-chip { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 50px; border: 2px solid var(--border); background: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; cursor: pointer; transition: all 0.2s; }
-  .filter-chip.active { background: var(--water); border-color: var(--water); color: #fff; }
-  .tab-nav { display: flex; background: #fff; border-bottom: 2px solid var(--border); }
-  .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-  .tab-btn.active { color: var(--water); border-bottom-color: var(--water); }
-  .list-view { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
-  .pad-card { background: var(--card); border-radius: 18px; overflow: hidden; border: 2px solid var(--border); box-shadow: 0 2px 16px rgba(26,111,163,0.07); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.3s ease both; }
-  .pad-card:active { transform: scale(0.98); }
-  .pad-card.hidden { display: none; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 14px 8px; gap: 8px; }
-  .card-city-badge { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 50px; background: var(--tag-bg); color: var(--deep); }
-  .card-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.2; flex: 1; }
-  .open-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px; white-space: nowrap; }
-  .open-badge.open { background: #e6f9ef; color: #2a9d5c; }
-  .open-badge.closed { background: #fff0f0; color: var(--coral); }
-  .card-address { padding: 0 14px 10px; font-size: 13px; color: var(--muted); font-weight: 600; }
-  .card-hours { padding: 0 14px 10px; font-size: 13px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px; }
-  .card-hours span { color: var(--muted); font-weight: 600; }
-  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 14px; }
-  .tag { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 50px; background: var(--tag-bg); color: var(--deep); }
-  .tag.green { background: #e6f9ef; color: #2a9d5c; }
-  .tag.yellow { background: #fff8e6; color: #c8820a; }
-  .tag.red { background: #fff0f0; color: var(--coral); }
-  .tag.gray { background: #f0f4f8; color: var(--muted); }
-  .county-divider { padding: 16px 16px 4px; display: flex; align-items: center; gap: 10px; }
-  .county-divider span { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--deep); background: var(--tag-bg); padding: 4px 12px; border-radius: 50px; white-space: nowrap; }
-  .county-divider::after { content: ''; flex: 1; height: 1.5px; background: var(--border); }
-  .detail-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(26,43,60,0.5); z-index: 100; display: none; align-items: flex-end; backdrop-filter: blur(4px); }
-  .detail-overlay.visible { display: flex; }
-  .detail-panel { background: var(--foam); width: 100%; max-height: 90vh; border-radius: 24px 24px 0 0; overflow-y: auto; animation: slideUp 0.3s ease; }
-  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .detail-drag-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
-  .detail-header { background: linear-gradient(135deg, var(--deep) 0%, var(--water) 100%); padding: 20px 20px 28px; position: relative; overflow: hidden; }
-  .detail-header::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 24px; background: var(--foam); border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
-  .detail-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: rgba(255,255,255,0.25); border: none; border-radius: 50%; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1; }
-  .detail-name { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; color: #fff; position: relative; z-index: 1; padding-right: 40px; line-height: 1.2; }
-  .detail-city { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 700; margin-top: 4px; position: relative; z-index: 1; }
-  .detail-body { padding: 20px 20px 40px; }
-  .detail-section { margin-bottom: 20px; }
-  .detail-section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px; }
-  .detail-info-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fff; border-radius: 12px; margin-bottom: 8px; border: 1.5px solid var(--border); }
-  .detail-info-icon { font-size: 18px; width: 28px; text-align: center; }
-  .detail-info-label { font-size: 13px; color: var(--muted); font-weight: 600; }
-  .detail-info-value { font-size: 14px; font-weight: 800; color: var(--text); margin-left: auto; text-align: right; }
-  .detail-amenities { display: flex; flex-wrap: wrap; gap: 8px; }
-  .detail-amenity { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #fff; border: 1.5px solid var(--border); border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--text); }
-  .directions-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--deep) 0%, var(--water) 100%); border: none; border-radius: 16px; color: #fff; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
-  .results-count { padding: 8px 16px 0; font-size: 13px; font-weight: 700; color: var(--deep); }
-  .view { display: none; }
-  .view.active { display: block; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Nunito',sans-serif;background:var(--foam);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+  /* HEADER */
+  .header{background:#fff;padding:12px 20px 0;border-bottom:3px solid var(--green-light);box-shadow:0 2px 12px rgba(90,171,74,0.1);text-align:center;}
+  .header img{width:200px;max-width:65%;display:block;margin:0 auto;}
+  .tagline{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:6px 0 10px;}
+
+  /* CONTROLS */
+  .controls{padding:14px 14px 8px;background:#fff;border-bottom:2px solid var(--border);}
+  .search-box{display:flex;align-items:center;background:var(--foam);border:2px solid var(--border);border-radius:14px;padding:10px 14px;gap:8px;margin-bottom:10px;}
+  .search-box input{border:none;outline:none;font-family:'Nunito',sans-serif;font-size:15px;color:var(--text);width:100%;background:transparent;}
+  .search-box input::placeholder{color:var(--muted);}
+  .filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+  .filter-row::-webkit-scrollbar{display:none;}
+  .filter-chip{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:50px;border:2px solid var(--border);background:#fff;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap;cursor:pointer;transition:all 0.2s;}
+  .filter-chip.active{background:var(--green);border-color:var(--green);color:#fff;}
+  .filter-chip:focus{outline:3px solid var(--orange);outline-offset:2px;}
+
+  /* TABS */
+  .tab-nav{display:flex;background:#fff;border-bottom:2px solid var(--border);}
+  .tab-btn{flex:1;padding:11px 4px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+  .tab-btn.active{color:var(--green);border-bottom-color:var(--green);}
+  .tab-btn:focus{outline:3px solid var(--orange);outline-offset:-2px;}
+
+  /* LIST */
+  .list-view{padding:12px 14px;display:flex;flex-direction:column;gap:12px;}
+  .pad-card{background:var(--card);border-radius:18px;overflow:hidden;border:2px solid var(--border);box-shadow:0 2px 12px rgba(90,171,74,0.07);cursor:pointer;transition:transform 0.15s;animation:fadeUp 0.3s ease both;}
+  .pad-card:active{transform:scale(0.98);}
+  .pad-card:focus{outline:3px solid var(--orange);outline-offset:2px;}
+  .pad-card.hidden{display:none;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 14px 6px;gap:8px;}
+  .card-city-badge{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:50px;background:var(--green-light);color:var(--green-dark);display:inline-block;margin-bottom:4px;}
+  .card-name{font-size:17px;font-weight:900;color:var(--text);line-height:1.2;}
+  .open-badge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:50px;white-space:nowrap;flex-shrink:0;}
+  .open-badge.open{background:#e6f9ef;color:#2a7a4f;}
+  .open-badge.closed{background:#fff0f0;color:#c0392b;}
+  .card-address{padding:0 14px 8px;font-size:12px;color:var(--muted);font-weight:700;}
+  .card-hours{padding:0 14px 10px;font-size:13px;font-weight:800;color:var(--text);}
+  .card-hours span{color:var(--muted);font-weight:600;}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 14px;}
+  .tag{font-size:11px;font-weight:800;padding:4px 9px;border-radius:50px;background:var(--green-light);color:var(--green-dark);}
+  .tag.orange{background:var(--orange-light);color:#8a5a00;}
+  .tag.red{background:#fff0f0;color:#c0392b;}
+  .tag.gray{background:#f0f4f0;color:var(--muted);}
+
+  /* COUNTY DIVIDER */
+  .county-divider{padding:14px 14px 4px;display:flex;align-items:center;gap:10px;}
+  .county-divider span{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--green-dark);background:var(--green-light);padding:4px 12px;border-radius:50px;white-space:nowrap;}
+  .county-divider::after{content:'';flex:1;height:1.5px;background:var(--border);}
+
+  /* MAP */
+  .map-container{padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .map-city-group{background:#fff;border-radius:16px;border:2px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(90,171,74,0.06);}
+  .map-city-header{background:var(--green);color:#fff;padding:10px 14px;font-size:13px;font-weight:900;}
+  .map-county-label{font-size:10px;font-weight:700;opacity:0.8;margin-left:6px;}
+  .map-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1.5px solid var(--border);gap:8px;}
+  .map-info{flex:1;}
+  .map-name{font-size:14px;font-weight:800;color:var(--text);}
+  .map-address{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .map-btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;}
+  .map-btn:focus{outline:3px solid var(--orange);outline-offset:2px;}
+
+  /* WHAT TO PACK */
+  .pack-container{padding:16px 14px 32px;}
+  .pack-hero{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:20px;padding:20px;text-align:center;margin-bottom:16px;color:#fff;}
+  .pack-hero-title{font-size:20px;font-weight:900;margin-bottom:6px;}
+  .pack-hero-sub{font-size:13px;font-weight:600;opacity:0.9;line-height:1.5;margin-bottom:16px;}
+  .pack-shop-btn{display:inline-block;background:#fff;color:var(--green-dark);border-radius:12px;padding:12px 24px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;text-decoration:none;cursor:pointer;}
+  .pack-shop-btn:focus{outline:3px solid var(--orange);outline-offset:2px;}
+  .pack-section-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin:16px 0 8px;}
+  .pack-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .pack-card{background:#fff;border-radius:14px;border:2px solid var(--border);padding:14px 12px;text-align:center;text-decoration:none;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform 0.15s;box-shadow:0 2px 8px rgba(90,171,74,0.06);}
+  .pack-card:active{transform:scale(0.97);}
+  .pack-card:focus{outline:3px solid var(--orange);outline-offset:2px;}
+  .pack-icon{font-size:28px;}
+  .pack-label{font-size:13px;font-weight:800;color:var(--text);line-height:1.3;}
+  .pack-sublabel{font-size:11px;font-weight:600;color:var(--muted);}
+  .pack-arrow{font-size:11px;font-weight:900;color:var(--green);margin-top:2px;}
+  .affiliate-note{font-size:11px;color:var(--muted);font-weight:600;text-align:center;margin-top:16px;line-height:1.6;padding:0 4px;}
+
+  /* SUBMIT */
+  .submit-container{padding:24px 14px;display:flex;flex-direction:column;gap:16px;}
+  .submit-card{background:#fff;border-radius:20px;border:2px solid var(--border);padding:24px;text-align:center;box-shadow:0 2px 12px rgba(90,171,74,0.07);}
+  .submit-frog{font-size:52px;margin-bottom:12px;}
+  .submit-title{font-size:20px;font-weight:900;color:var(--green-dark);margin-bottom:8px;}
+  .submit-desc{font-size:14px;color:var(--muted);font-weight:600;line-height:1.6;margin-bottom:20px;}
+  .submit-btn{display:block;background:var(--green);color:#fff;border:none;border-radius:14px;padding:14px 28px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;text-decoration:none;width:100%;text-align:center;}
+  .submit-btn:focus{outline:3px solid var(--orange);outline-offset:2px;}
+  .submit-note{font-size:12px;color:var(--muted);font-weight:700;line-height:1.6;text-align:center;padding:0 4px;}
+
+  /* DETAIL */
+  .detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(20,40,20,0.5);z-index:100;display:none;align-items:flex-end;backdrop-filter:blur(4px);}
+  .detail-overlay.visible{display:flex;}
+  .detail-panel{background:var(--foam);width:100%;max-height:90vh;border-radius:24px 24px 0 0;overflow-y:auto;animation:slideUp 0.3s ease;}
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .detail-drag{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+  .detail-header{background:linear-gradient(135deg,var(--green-dark) 0%,var(--green) 100%);padding:20px 20px 28px;position:relative;overflow:hidden;}
+  .detail-header::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:24px;background:var(--foam);border-radius:50% 50% 0 0/100% 100% 0 0;}
+  .detail-close{position:absolute;top:14px;right:14px;width:36px;height:36px;background:rgba(255,255,255,0.25);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;}
+  .detail-close:focus{outline:3px solid var(--orange);}
+  .detail-name{font-size:22px;font-weight:900;color:#fff;position:relative;z-index:1;padding-right:44px;line-height:1.2;}
+  .detail-city-label{color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;margin-top:4px;position:relative;z-index:1;}
+  .detail-body{padding:20px 16px 40px;}
+  .detail-section{margin-bottom:18px;}
+  .detail-section-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;}
+  .detail-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border-radius:12px;margin-bottom:6px;border:1.5px solid var(--border);}
+  .d-icon{font-size:17px;width:26px;text-align:center;}
+  .d-label{font-size:13px;color:var(--muted);font-weight:600;}
+  .d-value{font-size:13px;font-weight:800;color:var(--text);margin-left:auto;text-align:right;}
+  .amenities{display:flex;flex-wrap:wrap;gap:8px;}
+  .amenity{padding:8px 13px;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:700;}
+  .about-text{background:#fff;border-radius:12px;padding:14px;border:1.5px solid var(--border);font-size:14px;line-height:1.6;font-weight:600;}
+  .dir-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--green-dark),var(--green));border:none;border-radius:14px;color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;}
+  .dir-btn:focus{outline:3px solid var(--orange);outline-offset:2px;}
+
+  /* FOOTER */
+  .footer{background:#fff;border-top:2px solid var(--border);padding:20px 16px;text-align:center;margin-top:8px;}
+  .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:10px;}
+  .footer-links a{font-size:12px;font-weight:700;color:var(--muted);text-decoration:none;}
+  .footer-links a:hover{color:var(--green);}
+  .footer-links a:focus{outline:3px solid var(--orange);outline-offset:2px;border-radius:4px;}
+  .footer-copy{font-size:11px;color:var(--muted);font-weight:600;line-height:1.6;}
+  .footer-affiliate{font-size:11px;color:var(--muted);font-weight:600;margin-top:6px;line-height:1.5;}
+
+  .results-count{padding:8px 14px 0;font-size:13px;font-weight:700;color:var(--green-dark);}
+  .view{display:none;}
+  .view.active{display:block;}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-wave"></div>
-  <div class="ripple-bg"></div><div class="ripple-bg"></div><div class="ripple-bg"></div>
-  <div class="logo-row">
-    <div class="logo-icon">💧</div>
-    <div>
-      <div class="logo-text">Splash <span>Finder</span></div>
+<div class="header" role="banner">
+  <img src="logo.png" alt="Splashfinders — Local Splash Pads, Southwest Suburbs Illinois">
+  <div class="tagline" aria-label="Coverage area: Will, Kendall, and Grundy Counties">Will · Kendall · Grundy Counties</div>
+</div>
+
+<div class="controls" role="search" aria-label="Search and filter splash pads">
+  <div class="search-box">
+    <span aria-hidden="true">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search city or park name..." oninput="filterPads()" aria-label="Search splash pads by city or park name">
+  </div>
+  <div class="filter-row" role="group" aria-label="Filter by amenity">
+    <button class="filter-chip active" onclick="setFilter('all',this)" aria-pressed="true">🗺️ All</button>
+    <button class="filter-chip" onclick="setFilter('restrooms',this)" aria-pressed="false">🚻 Restrooms</button>
+    <button class="filter-chip" onclick="setFilter('fenced',this)" aria-pressed="false">🔒 Fenced</button>
+    <button class="filter-chip" onclick="setFilter('free',this)" aria-pressed="false">✅ Free</button>
+    <button class="filter-chip" onclick="setFilter('toddler',this)" aria-pressed="false">👶 Toddler OK</button>
+    <button class="filter-chip" onclick="setFilter('shade',this)" aria-pressed="false">🌳 Shade</button>
+    <button class="filter-chip" onclick="setFilter('parking',this)" aria-pressed="false">🅿️ Parking</button>
+  </div>
+</div>
+
+<nav class="tab-nav" role="tablist" aria-label="App sections">
+  <button class="tab-btn active" onclick="switchTab('list',this)" role="tab" aria-selected="true" aria-controls="listView">📋 List</button>
+  <button class="tab-btn" onclick="switchTab('map',this)" role="tab" aria-selected="false" aria-controls="mapView">🗺️ Map</button>
+  <button class="tab-btn" onclick="switchTab('pack',this)" role="tab" aria-selected="false" aria-controls="packView">🎒 Pack</button>
+  <button class="tab-btn" onclick="switchTab('submit',this)" role="tab" aria-selected="false" aria-controls="submitView">➕ Submit</button>
+</nav>
+
+<main>
+<div id="listView" class="view active" role="tabpanel" aria-label="Splash pad list">
+  <div class="results-count" id="resultsCount" aria-live="polite"></div>
+  <div class="list-view" id="padList"></div>
+  <footer class="footer" role="contentinfo">
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer">Our Amazon Store</a>
+    </div>
+    <div class="footer-copy">© 2025 Splashfinders · Will, Kendall & Grundy Counties, IL</div>
+    <div class="footer-affiliate">As an Amazon Associate we earn from qualifying purchases.</div>
+  </footer>
+</div>
+
+<div id="mapView" class="view" role="tabpanel" aria-label="Map view by city">
+  <div class="map-container" id="mapContainer"></div>
+</div>
+
+<div id="packView" class="view" role="tabpanel" aria-label="What to pack for splash pads">
+  <div class="pack-container">
+    <div class="pack-hero">
+      <div class="pack-hero-title">☀️ What to Pack</div>
+      <div class="pack-hero-sub">Everything you need for a perfect splash pad day — curated by a local mom who's been to every single one of these parks.</div>
+      <a class="pack-shop-btn" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop our full splash pad essentials list on Amazon">🛒 Shop the Full List on Amazon</a>
+    </div>
+
+    <div class="pack-section-title">Sun & Skin</div>
+    <div class="pack-grid">
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop sunscreen on Amazon">
+        <div class="pack-icon">🧴</div>
+        <div class="pack-label">Sunscreen</div>
+        <div class="pack-sublabel">SPF 50+ for kids</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop rash guards on Amazon">
+        <div class="pack-icon">👕</div>
+        <div class="pack-label">Rash Guards</div>
+        <div class="pack-sublabel">UPF sun protection</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+    </div>
+
+    <div class="pack-section-title">Water Gear</div>
+    <div class="pack-grid">
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop water shoes on Amazon">
+        <div class="pack-icon">👟</div>
+        <div class="pack-label">Water Shoes</div>
+        <div class="pack-sublabel">For hot pavement</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop swim diapers on Amazon">
+        <div class="pack-icon">🩲</div>
+        <div class="pack-label">Swim Diapers</div>
+        <div class="pack-sublabel">Reusable & disposable</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop waterproof phone pouches on Amazon">
+        <div class="pack-icon">📱</div>
+        <div class="pack-label">Phone Pouch</div>
+        <div class="pack-sublabel">Waterproof & touchscreen</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop dry bags on Amazon">
+        <div class="pack-icon">🎒</div>
+        <div class="pack-label">Dry Bag</div>
+        <div class="pack-sublabel">For wet clothes & gear</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+    </div>
+
+    <div class="pack-section-title">After the Splash</div>
+    <div class="pack-grid">
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop hooded towel ponchos on Amazon">
+        <div class="pack-icon">🏖️</div>
+        <div class="pack-label">Towel Poncho</div>
+        <div class="pack-sublabel">Hooded kids coverup</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop insulated water bottles on Amazon">
+        <div class="pack-icon">💧</div>
+        <div class="pack-label">Water Bottle</div>
+        <div class="pack-sublabel">Insulated & spill-proof</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+    </div>
+
+    <div class="pack-section-title">Snacks & Comfort</div>
+    <div class="pack-grid">
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop portable snack containers on Amazon">
+        <div class="pack-icon">🍎</div>
+        <div class="pack-label">Snack Containers</div>
+        <div class="pack-sublabel">Leak-proof & easy open</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+      <a class="pack-card" href="https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20" target="_blank" rel="noopener noreferrer" aria-label="Shop portable cooling fans on Amazon">
+        <div class="pack-icon">🌬️</div>
+        <div class="pack-label">Cooling Fan</div>
+        <div class="pack-sublabel">Portable & rechargeable</div>
+        <div class="pack-arrow">Shop →</div>
+      </a>
+    </div>
+
+    <div class="affiliate-note">
+      As an Amazon Associate, Splashfinders earns from qualifying purchases. This helps us keep the app free and up to date for every family in the southwest suburbs. 💚
     </div>
   </div>
-  <div class="tagline">Will · Kendall · Grundy Counties · Free splash pads near you</div>
 </div>
 
-<div class="controls">
-  <div class="search-box">
-    <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Search by city or park name..." oninput="filterPads()">
-  </div>
-  <div class="filter-row">
-    <button class="filter-chip active" onclick="setFilter('all', this)">🗺️ All</button>
-    <button class="filter-chip" onclick="setFilter('restrooms', this)">🚻 Restrooms</button>
-    <button class="filter-chip" onclick="setFilter('fenced', this)">🔒 Fenced</button>
-    <button class="filter-chip" onclick="setFilter('free', this)">✅ Free</button>
-    <button class="filter-chip" onclick="setFilter('toddler', this)">👶 Toddler OK</button>
-    <button class="filter-chip" onclick="setFilter('shade', this)">🌳 Shade</button>
-    <button class="filter-chip" onclick="setFilter('parking', this)">🅿️ Parking</button>
+<div id="submitView" class="view" role="tabpanel" aria-label="Submit a splash pad">
+  <div class="submit-container">
+    <div class="submit-card">
+      <div class="submit-frog" aria-hidden="true">🐸</div>
+      <div class="submit-title">Know a Splash Pad We Missed?</div>
+      <div class="submit-desc">Help us keep Splashfinders complete for every family in the southwest suburbs. Submit a location and we'll research and add it to the app.</div>
+      <a class="submit-btn" href="https://forms.gle/YOUR_FORM_ID_HERE" target="_blank" rel="noopener noreferrer" aria-label="Submit a splash pad via Google Form">➕ Submit a Splash Pad</a>
+    </div>
+    <div class="submit-note">All submissions are reviewed before being added. We verify hours, amenities, and details before publishing. Thank you for helping your community! 💚</div>
   </div>
 </div>
+</main>
 
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('list', this)">📋 List View</button>
-  <button class="tab-btn" onclick="switchTab('map', this)">🗺️ Map View</button>
-</div>
-
-<div id="listView" class="view active">
-  <div class="results-count" id="resultsCount"></div>
-  <div class="list-view" id="padList"></div>
-</div>
-
-<div id="mapView" class="view">
-  <div style="padding:20px;text-align:center;color:var(--muted);font-weight:700;font-size:14px;background:#fff;border-bottom:2px solid var(--border);">🗺️ Tap any card below to get directions</div>
-  <div class="list-view" id="mapCardList" style="padding-top:12px;"></div>
-</div>
-
-<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
-  <div class="detail-panel" id="detailPanel">
-    <div class="detail-drag-handle"></div>
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)" role="dialog" aria-modal="true" aria-labelledby="detailName">
+  <div class="detail-panel">
+    <div class="detail-drag" aria-hidden="true"></div>
     <div class="detail-header">
-      <button class="detail-close" onclick="closeDetailBtn()">✕</button>
+      <button class="detail-close" onclick="closeDetailBtn()" aria-label="Close park details">✕</button>
       <div class="detail-name" id="detailName"></div>
-      <div class="detail-city" id="detailCity"></div>
+      <div class="detail-city-label" id="detailCity"></div>
     </div>
     <div class="detail-body" id="detailBody"></div>
   </div>
 </div>
 
 <script>
+const AMAZON = 'https://www.amazon.com/shop/thehobblets/list/1PHUZQGW7HMUQ?tag=klhmedia-20';
+
 const splashPads = [
-  // WILL COUNTY
-  {
-    id: 1, county: "Will County",
-    name: "Brent Hassert Park", city: "Crest Hill",
-    address: "19623 Renwick Rd, Crest Hill, IL 60441",
-    hours: "10:00am – 7:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: true, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "77-acre park with toddler and older kids playground sections, trails, picnic pavilions, and sports fields. Soft rubber surface. One of the most beloved splash pads in Will County.",
-  },
-  {
-    id: 2, county: "Will County",
-    name: "Village Green Park", city: "Plainfield",
-    address: "24121 W Chicago St, Plainfield, IL 60544",
-    hours: "10:30am – 5:00pm", season: "May 24 – September 1",
-    free: true, fenced: false, restrooms: true, parking: true, shade: true, toddler: false,
-    ageRange: "Ages 4+",
-    notes: "Downtown Plainfield community park with walking path, covered picnic areas, and playground. Best for kids 4 and up. Season ends September 1.",
-  },
-  {
-    id: 3, county: "Will County",
-    name: "Wynstone Park", city: "Shorewood",
-    address: "21235 Wynstone Dr, Shorewood, IL 60404",
-    hours: "10:00am – 8:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: null, parking: true, shade: null, toddler: true,
-    ageRange: "All ages",
-    notes: "Neighborhood park with baseball, soccer, picnic areas, and playground. One of three Shorewood splash pads — all free with the same hours.",
-  },
-  {
-    id: 4, county: "Will County",
-    name: "West Shore Park", city: "Shorewood",
-    address: "Westshore Dr & Turtle St, Shorewood, IL 60404",
-    hours: "10:00am – 8:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: null, parking: true, shade: null, toddler: true,
-    ageRange: "All ages",
-    notes: "Along the DuPage River with sand volleyball, playground, and picnic shelter. Beautiful riverfront setting.",
-  },
-  {
-    id: 5, county: "Will County",
-    name: "Towne Center Park", city: "Shorewood",
-    address: "1 Towne Center Blvd, Shorewood, IL 60404",
-    hours: "10:00am – 8:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: null, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Adjacent to Village Hall and Veterans Memorial. Amphitheater, playground, shaded picnic tables. Movies in the park in summer.",
-  },
-  {
-    id: 6, county: "Will County",
-    name: "95th Street Community Plaza", city: "Naperville",
-    address: "3109 Cedar Glade Dr, Naperville, IL 60564",
-    hours: "9:00am – 8:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: true, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "12 & under (under 7 with adult)",
-    notes: "Storybook-themed literacy playground next to 95th Street Library. Enclosed splash pad, shaded pavilion, restrooms with showers. Push-button operated with rotating water zones.",
-  },
-  {
-    id: 7, county: "Will County",
-    name: "Wolf's Crossing Community Park", city: "Naperville",
-    address: "3252 Wolf's Crossing Rd, Naperville, IL 60543",
-    hours: "9:00am – 8:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "35-acre park with challenge course, nature play area, sensory garden, sports courts, 1.4-mile trail, and restrooms with showers. Push-button operated splash pad.",
-  },
-  {
-    id: 10, county: "Will County",
-    name: "Northview Park", city: "Lemont",
-    address: "1115 McCarthy Rd, Lemont, IL 60439",
-    hours: "10:00am – 7:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Renovated community park with zipline, splash pad, playground, and pavilion with grills. One-hour courtesy limit when busy. Only splash pad in Lemont — second one planned at Derby Farms Park.",
-  },
-  {
-    id: 11, county: "Will County",
-    name: "Central Park Spray Pad", city: "Bolingbrook",
-    address: "301 Recreation Dr, Bolingbrook, IL 60440",
-    hours: "9:00am – 6:00pm", season: "Late Spring – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Brand new spray pad opened May 2025 across from the skate plaza. 16 spray features with shade structures, benches, and picnic tables. 72-acre park with playground, tennis, basketball, and trails.",
-  },
-  {
-    id: 15, county: "Will County",
-    name: "Romeoville Splash Park", city: "Romeoville",
-    address: "630 Townhall Dr, Romeoville, IL 60446",
-    hours: "Dawn – Dusk", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Flagship Romeoville splash park opened 2023. 2,600 sq ft with 50+ spray features for all ages including a giant dump bucket. Four outdoor changing rooms with showers, shade sails, seating. Capacity 200.",
-  },
-  {
-    id: 16, county: "Will County",
-    name: "Boucher Prairie Park", city: "Romeoville",
-    address: "1649 Richfield Trail, Romeoville, IL 60446",
-    hours: "Dawn – Dusk", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: null, parking: true, shade: null, toddler: true,
-    ageRange: "All ages",
-    notes: "Free neighborhood splash pad in Romeoville. One of three village-operated splash pads, all free and open dawn to dusk.",
-  },
-  {
-    id: 17, county: "Will County",
-    name: "Volunteer Park", city: "Romeoville",
-    address: "1100 Murphy Dr, Romeoville, IL 60446",
-    hours: "Dawn – Dusk", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: null, parking: true, shade: null, toddler: true,
-    ageRange: "All ages",
-    notes: "Free neighborhood splash pad in Romeoville. One of three village-operated splash pads, all free and open dawn to dusk.",
-  },
-  {
-    id: 18, county: "Will County",
-    name: "Ronald D. Lehman Community Park", city: "Channahon",
-    address: "23304 W McClintock Rd, Channahon, IL 60410",
-    hours: "9:00am – 8:00pm", season: "Memorial Day – October 1",
-    free: true, fenced: null, restrooms: true, parking: true, shade: null, toddler: true,
-    ageRange: "10 & under supervised",
-    notes: "One of the longest seasons on the list — open all the way through October 1. Operated by Channahon Park District. Children under 10 must be supervised at all times.",
-  },
-  // KENDALL COUNTY
-  {
-    id: 8, county: "Kendall County",
-    name: "Prairie Point Splash Pad", city: "Oswego",
-    address: "4120 Plainfield Rd, Oswego, IL 60543",
-    hours: "11:00am – 7:30pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: true, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "One of the best in the region. 17 spray features in a fully gated splash pad with a dedicated tot area with gentler sprayers. Benches, shade shelter, and restrooms inside the fence. Skate park, basketball, and volleyball nearby.",
-  },
-  {
-    id: 9, county: "Kendall County",
-    name: "Riemenschneider Fire & Spray Park", city: "Yorkville",
-    address: "600 Hayden Dr, Yorkville, IL 60560",
-    hours: "10:00am – 7:00pm", season: "Memorial Day – Labor Day",
-    free: true, fenced: false, restrooms: false, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Firefighter-themed — activate the water by holding your hand over a fire hydrant! Fire truck tot lot, ages 5–12 structure, swings, covered picnic tables, walking path, two baseball fields on 8 acres. A hidden gem.",
-  },
-  // GRUNDY COUNTY
-  {
-    id: 12, county: "Grundy County",
-    name: "Aux Sable Springs Park", city: "Minooka",
-    address: "2500 Holt Rd, Minooka, IL 60447",
-    hours: "Open daily", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Brand new Phase 2 completed summer 2025 — fresh splash pad, bamboo jungle, accessible equipment, pickleball courts, baseball fields, and canoe launch along Aux Sable Creek.",
-  },
-  {
-    id: 13, county: "Grundy County",
-    name: "Lions Park", city: "Minooka",
-    address: "8875 McEvilly Rd, Minooka, IL 60447",
-    hours: "Open daily", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: true, toddler: true,
-    ageRange: "All ages",
-    notes: "Wooded neighborhood park with large gazebos, open field, volleyball court, basketball court, walking path, and playground. Toddler and older kids friendly. Near Minooka Creamery.",
-  },
-  {
-    id: 14, county: "Grundy County",
-    name: "Summit Park", city: "Minooka",
-    address: "250 Rivers Edge Dr, Minooka, IL 60447",
-    hours: "Open daily", season: "Memorial Day – Labor Day",
-    free: true, fenced: null, restrooms: true, parking: true, shade: null, toddler: true,
-    ageRange: "All ages",
-    notes: "Riverside park with pavilion, playground, and splash pad. All three Minooka splash pads are free, run Memorial Day through Labor Day, and are operated by the Village of Minooka.",
-  },
+  {id:1,county:"Will County",name:"Brent Hassert Park",city:"Crest Hill",address:"19623 Renwick Rd, Crest Hill, IL 60441",hours:"10:00am – 7:00pm",season:"Memorial Day – Labor Day",free:true,fenced:true,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"77-acre park with toddler and older kids playground sections, trails, picnic pavilions, and sports fields. Soft rubber surface. One of the most beloved splash pads in Will County."},
+  {id:2,county:"Will County",name:"Village Green Park",city:"Plainfield",address:"24121 W Chicago St, Plainfield, IL 60544",hours:"10:30am – 5:00pm",season:"May 24 – September 1",free:true,fenced:false,restrooms:true,parking:true,shade:true,toddler:false,ageRange:"Ages 4+",notes:"Downtown Plainfield community park with walking path, covered picnic areas, and playground. Best for kids 4 and up. Season ends September 1."},
+  {id:3,county:"Will County",name:"Wynstone Park",city:"Shorewood",address:"21235 Wynstone Dr, Shorewood, IL 60404",hours:"10:00am – 8:00pm",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:null,parking:true,shade:null,toddler:true,ageRange:"All ages",notes:"Neighborhood park with baseball, soccer, picnic areas, and playground. One of three Shorewood splash pads — all free with the same hours."},
+  {id:4,county:"Will County",name:"West Shore Park",city:"Shorewood",address:"Westshore Dr & Turtle St, Shorewood, IL 60404",hours:"10:00am – 8:00pm",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:null,parking:true,shade:null,toddler:true,ageRange:"All ages",notes:"Along the DuPage River with sand volleyball, playground, and picnic shelter. Beautiful riverfront setting."},
+  {id:5,county:"Will County",name:"Towne Center Park",city:"Shorewood",address:"1 Towne Center Blvd, Shorewood, IL 60404",hours:"10:00am – 8:00pm",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:null,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Adjacent to Village Hall and Veterans Memorial. Amphitheater, playground, shaded picnic tables. Movies in the park in summer."},
+  {id:6,county:"Will County",name:"95th Street Community Plaza",city:"Naperville",address:"3109 Cedar Glade Dr, Naperville, IL 60564",hours:"9:00am – 8:00pm",season:"Memorial Day – Labor Day",free:true,fenced:true,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"12 & under",notes:"Storybook-themed literacy playground next to 95th Street Library. Enclosed splash pad, shaded pavilion, restrooms with showers. Push-button operated with rotating water zones."},
+  {id:7,county:"Will County",name:"Wolf's Crossing Community Park",city:"Naperville",address:"3252 Wolf's Crossing Rd, Naperville, IL 60543",hours:"9:00am – 8:00pm",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"35-acre park with challenge course, nature play area, sensory garden, sports courts, 1.4-mile trail, and restrooms with showers."},
+  {id:10,county:"Will County",name:"Northview Park",city:"Lemont",address:"1115 McCarthy Rd, Lemont, IL 60439",hours:"10:00am – 7:00pm",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Renovated community park with zipline, splash pad, playground, and pavilion with grills. One-hour courtesy limit when busy."},
+  {id:11,county:"Will County",name:"Central Park Spray Pad",city:"Bolingbrook",address:"301 Recreation Dr, Bolingbrook, IL 60440",hours:"9:00am – 6:00pm",season:"Late Spring – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Brand new spray pad opened May 2025. 16 spray features with shade structures, benches, and picnic tables. 72-acre park with playground, tennis, basketball, and trails."},
+  {id:15,county:"Will County",name:"Romeoville Splash Park",city:"Romeoville",address:"630 Townhall Dr, Romeoville, IL 60446",hours:"Dawn – Dusk",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Flagship Romeoville splash park. 2,600 sq ft with 50+ spray features including a giant dump bucket. Four outdoor changing rooms with showers and shade sails."},
+  {id:16,county:"Will County",name:"Boucher Prairie Park",city:"Romeoville",address:"1649 Richfield Trail, Romeoville, IL 60446",hours:"Dawn – Dusk",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:null,parking:true,shade:null,toddler:true,ageRange:"All ages",notes:"Free neighborhood splash pad in Romeoville. One of three village-operated splash pads, all free and open dawn to dusk."},
+  {id:17,county:"Will County",name:"Volunteer Park",city:"Romeoville",address:"1100 Murphy Dr, Romeoville, IL 60446",hours:"Dawn – Dusk",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:null,parking:true,shade:null,toddler:true,ageRange:"All ages",notes:"Free neighborhood splash pad in Romeoville. One of three village-operated splash pads, all free and open dawn to dusk."},
+  {id:18,county:"Will County",name:"Ronald D. Lehman Community Park",city:"Channahon",address:"23304 W McClintock Rd, Channahon, IL 60410",hours:"9:00am – 8:00pm",season:"Memorial Day – October 1",free:true,fenced:null,restrooms:true,parking:true,shade:null,toddler:true,ageRange:"10 & under supervised",notes:"One of the longest seasons on the list — open all the way through October 1. Children under 10 must be supervised at all times."},
+  {id:8,county:"Kendall County",name:"Prairie Point Splash Pad",city:"Oswego",address:"4120 Plainfield Rd, Oswego, IL 60543",hours:"11:00am – 7:30pm",season:"Memorial Day – Labor Day",free:true,fenced:true,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"One of the best in the region. 17 spray features in a fully gated splash pad with a dedicated tot area with gentler sprayers. Benches and shade shelter inside the fence."},
+  {id:9,county:"Kendall County",name:"Riemenschneider Fire & Spray Park",city:"Yorkville",address:"600 Hayden Dr, Yorkville, IL 60560",hours:"10:00am – 7:00pm",season:"Memorial Day – Labor Day",free:true,fenced:false,restrooms:false,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Firefighter-themed — activate the water by holding your hand over a fire hydrant! Fire truck tot lot, covered picnic tables, walking path, and two baseball fields on 8 acres."},
+  {id:12,county:"Grundy County",name:"Aux Sable Springs Park",city:"Minooka",address:"2500 Holt Rd, Minooka, IL 60447",hours:"Open daily",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Phase 2 completed summer 2025 — fresh splash pad, bamboo jungle, accessible equipment, pickleball courts, baseball fields, and canoe launch along Aux Sable Creek."},
+  {id:13,county:"Grundy County",name:"Lions Park",city:"Minooka",address:"8875 McEvilly Rd, Minooka, IL 60447",hours:"Open daily",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:true,toddler:true,ageRange:"All ages",notes:"Wooded neighborhood park with large gazebos, volleyball court, basketball court, walking path, and playground."},
+  {id:14,county:"Grundy County",name:"Summit Park",city:"Minooka",address:"250 Rivers Edge Dr, Minooka, IL 60447",hours:"Open daily",season:"Memorial Day – Labor Day",free:true,fenced:null,restrooms:true,parking:true,shade:null,toddler:true,ageRange:"All ages",notes:"Riverside park with pavilion, playground, and splash pad. All three Minooka splash pads are free, Memorial Day through Labor Day."},
 ];
 
-const countyOrder = ["Will County", "Kendall County", "Grundy County"];
-let activeFilter = 'all';
+const countyOrder=["Will County","Kendall County","Grundy County"];
+let activeFilter='all';
 
-function getStatusBadge(pad) {
-  const now = new Date();
-  const month = now.getMonth();
-  const hour = now.getHours();
-  // Season check
-  const isSummer = month >= 4 && month <= 8;
-  // Channahon open through Oct 1
-  const isExtended = pad.id === 18 && (month >= 4 && month <= 8);
-  if (!isSummer && !isExtended) return { text: 'Closed for Season', cls: 'closed' };
-  if (pad.hours === 'Open daily' || pad.hours === 'Dawn – Dusk') return { text: 'Open Now', cls: 'open' };
-  const match = pad.hours.match(/(\d+):(\d+)(am|pm)\s*[–-]\s*(\d+):(\d+)(am|pm)/i);
-  if (match) {
-    let openH = parseInt(match[1]); if (match[3].toLowerCase() === 'pm' && openH !== 12) openH += 12;
-    let closeH = parseInt(match[4]); if (match[6].toLowerCase() === 'pm' && closeH !== 12) closeH += 12;
-    if (hour >= openH && hour < closeH) return { text: 'Open Now', cls: 'open' };
+function getStatus(pad){
+  const now=new Date(),m=now.getMonth(),h=now.getHours();
+  if(m<4||m>8) return {text:'Closed for Season',cls:'closed'};
+  if(pad.hours==='Open daily'||pad.hours==='Dawn – Dusk') return {text:'Open Now',cls:'open'};
+  const rx=pad.hours.match(/(\d+):(\d+)(am|pm)\s*[–-]\s*(\d+):(\d+)(am|pm)/i);
+  if(rx){
+    let oh=parseInt(rx[1]); if(rx[3].toLowerCase()==='pm'&&oh!==12) oh+=12;
+    let ch=parseInt(rx[4]); if(rx[6].toLowerCase()==='pm'&&ch!==12) ch+=12;
+    if(h>=oh&&h<ch) return {text:'Open Now',cls:'open'};
   }
-  return { text: 'Closed Today', cls: 'closed' };
+  return {text:'Closed Today',cls:'closed'};
 }
 
-function boolTag(val, trueLabel, trueClass, falseLabel, falseClass) {
-  if (val === null || val === undefined) return `<span class="tag gray">❓ Unknown</span>`;
-  if (val) return `<span class="tag ${trueClass}">${trueLabel}</span>`;
-  return `<span class="tag ${falseClass}">${falseLabel}</span>`;
+function boolTag(val,tL,fL){
+  if(val===null||val===undefined) return '<span class="tag gray">❓ Unknown</span>';
+  return val?'<span class="tag">'+tL+'</span>':'<span class="tag red">'+fL+'</span>';
 }
 
-function renderCard(pad, idPrefix = '') {
-  const status = getStatusBadge(pad);
-  return `
-    <div class="pad-card" id="${idPrefix}card-${pad.id}" onclick="openDetail(${pad.id})">
-      <div class="card-header">
-        <div>
-          <div style="margin-bottom:4px"><span class="card-city-badge">${pad.city}</span></div>
-          <div class="card-name">${pad.name}</div>
-        </div>
-        <span class="open-badge ${status.cls}">${status.text}</span>
-      </div>
-      <div class="card-address">📍 ${pad.address}</div>
-      <div class="card-hours">🕐 <span>${pad.hours}</span></div>
-      <div class="card-tags">
-        ${pad.free ? '<span class="tag green">✅ Free</span>' : '<span class="tag yellow">💰 Paid</span>'}
-        ${boolTag(pad.fenced, '🔒 Fenced', 'green', '🔓 Not Fenced', 'red')}
-        ${boolTag(pad.restrooms, '🚻 Restrooms', 'green', '🚫 No Restrooms', 'red')}
-        ${boolTag(pad.shade, '🌳 Shade', 'green', '☀️ No Shade', 'yellow')}
-        ${pad.toddler ? '<span class="tag green">👶 Toddler OK</span>' : ''}
-        ${pad.parking ? '<span class="tag green">🅿️ Parking</span>' : ''}
-      </div>
-    </div>`;
+function renderCard(pad){
+  const s=getStatus(pad);
+  return '<div class="pad-card" id="card-'+pad.id+'" onclick="openDetail('+pad.id+')" tabindex="0" role="button" aria-label="View details for '+pad.name+' in '+pad.city+'" onkeypress="if(event.key===\'Enter\')openDetail('+pad.id+')">'
+    +'<div class="card-header"><div><span class="card-city-badge">'+pad.city+'</span><div class="card-name">'+pad.name+'</div></div>'
+    +'<span class="open-badge '+s.cls+'" aria-label="Status: '+s.text+'">'+s.text+'</span></div>'
+    +'<div class="card-address">📍 '+pad.address+'</div>'
+    +'<div class="card-hours">🕐 <span>'+pad.hours+' · '+pad.season+'</span></div>'
+    +'<div class="card-tags" aria-label="Amenities">'
+    +(pad.free?'<span class="tag">✅ Free</span>':'<span class="tag orange">💰 Paid</span>')
+    +boolTag(pad.fenced,'🔒 Fenced','🔓 Not Fenced')
+    +boolTag(pad.restrooms,'🚻 Restrooms','🚫 No Restrooms')
+    +boolTag(pad.shade,'🌳 Shade','☀️ No Shade')
+    +(pad.toddler?'<span class="tag">👶 Toddler OK</span>':'')
+    +(pad.parking?'<span class="tag">🅿️ Parking</span>':'')
+    +'</div></div>';
 }
 
-function filterPads() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  let visible = 0;
-  splashPads.forEach(pad => {
-    const matchSearch = pad.name.toLowerCase().includes(query) || pad.city.toLowerCase().includes(query) || pad.county.toLowerCase().includes(query);
-    let matchFilter = true;
-    if (activeFilter === 'restrooms') matchFilter = pad.restrooms === true;
-    else if (activeFilter === 'fenced') matchFilter = pad.fenced === true;
-    else if (activeFilter === 'free') matchFilter = pad.free === true;
-    else if (activeFilter === 'toddler') matchFilter = pad.toddler === true;
-    else if (activeFilter === 'shade') matchFilter = pad.shade === true;
-    else if (activeFilter === 'parking') matchFilter = pad.parking === true;
-    const show = matchSearch && matchFilter;
-    const card = document.getElementById(`card-${pad.id}`);
-    const mapCard = document.getElementById(`map-card-${pad.id}`);
-    if (card) card.classList.toggle('hidden', !show);
-    if (mapCard) mapCard.classList.toggle('hidden', !show);
-    if (show) visible++;
+function filterPads(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let visible=0;
+  splashPads.forEach(pad=>{
+    const ms=pad.name.toLowerCase().includes(q)||pad.city.toLowerCase().includes(q)||pad.county.toLowerCase().includes(q);
+    const mf=activeFilter==='all'||(activeFilter==='restrooms'&&pad.restrooms===true)||(activeFilter==='fenced'&&pad.fenced===true)||(activeFilter==='free'&&pad.free===true)||(activeFilter==='toddler'&&pad.toddler===true)||(activeFilter==='shade'&&pad.shade===true)||(activeFilter==='parking'&&pad.parking===true);
+    const show=ms&&mf;
+    const c=document.getElementById('card-'+pad.id);
+    if(c) c.classList.toggle('hidden',!show);
+    if(show) visible++;
   });
-  countyOrder.forEach(county => {
-    const divId = `divider-${county.replace(/\s+/g, '-')}`;
-    const mapDivId = `map-divider-${county.replace(/\s+/g, '-')}`;
-    const anyVisible = splashPads.filter(p => p.county === county).some(p => {
-      const ms = p.name.toLowerCase().includes(query) || p.city.toLowerCase().includes(query) || p.county.toLowerCase().includes(query);
-      let mf = true;
-      if (activeFilter === 'restrooms') mf = p.restrooms === true;
-      else if (activeFilter === 'fenced') mf = p.fenced === true;
-      else if (activeFilter === 'free') mf = p.free === true;
-      else if (activeFilter === 'toddler') mf = p.toddler === true;
-      else if (activeFilter === 'shade') mf = p.shade === true;
-      else if (activeFilter === 'parking') mf = p.parking === true;
-      return ms && mf;
-    });
-    const d = document.getElementById(divId);
-    const md = document.getElementById(mapDivId);
-    if (d) d.style.display = anyVisible ? '' : 'none';
-    if (md) md.style.display = anyVisible ? '' : 'none';
+  countyOrder.forEach(county=>{
+    const d=document.getElementById('div-'+county.replace(/\s+/g,'-'));
+    if(d){
+      const any=splashPads.filter(p=>p.county===county).some(p=>{
+        const ms=p.name.toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.county.toLowerCase().includes(q);
+        const mf=activeFilter==='all'||(activeFilter==='restrooms'&&p.restrooms===true)||(activeFilter==='fenced'&&p.fenced===true)||(activeFilter==='free'&&p.free===true)||(activeFilter==='toddler'&&p.toddler===true)||(activeFilter==='shade'&&p.shade===true)||(activeFilter==='parking'&&p.parking===true);
+        return ms&&mf;
+      });
+      d.style.display=any?'':'none';
+    }
   });
-  document.getElementById('resultsCount').textContent = `${visible} splash pad${visible !== 1 ? 's' : ''} found`;
+  const rc=document.getElementById('resultsCount');
+  if(rc) rc.textContent=visible+' splash pad'+(visible!==1?'s':'')+' found';
 }
 
-function setFilter(filter, btn) {
-  activeFilter = filter;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-chip').forEach(c=>{c.classList.remove('active');c.setAttribute('aria-pressed','false');});
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed','true');
   filterPads();
 }
 
-function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});
   btn.classList.add('active');
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(tab === 'list' ? 'listView' : 'mapView').classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(tab+'View').classList.add('active');
 }
 
-function openDetail(id) {
-  const pad = splashPads.find(p => p.id === id);
-  if (!pad) return;
-  document.getElementById('detailName').textContent = pad.name;
-  document.getElementById('detailCity').textContent = `📍 ${pad.city}, IL · ${pad.county}`;
-  document.getElementById('detailBody').innerHTML = `
-    <div class="detail-section">
-      <div class="detail-section-title">Hours & Season</div>
-      <div class="detail-info-row"><span class="detail-info-icon">🕐</span><span class="detail-info-label">Daily Hours</span><span class="detail-info-value">${pad.hours}</span></div>
-      <div class="detail-info-row"><span class="detail-info-icon">📅</span><span class="detail-info-label">Season</span><span class="detail-info-value">${pad.season}</span></div>
-      <div class="detail-info-row"><span class="detail-info-icon">👦</span><span class="detail-info-label">Age Range</span><span class="detail-info-value">${pad.ageRange}</span></div>
-      <div class="detail-info-row"><span class="detail-info-icon">💵</span><span class="detail-info-label">Admission</span><span class="detail-info-value" style="color:${pad.free ? '#2a9d5c' : '#c8820a'}">${pad.free ? 'Free' : 'Paid'}</span></div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Amenities</div>
-      <div class="detail-amenities">
-        ${pad.fenced === true ? '<div class="detail-amenity">🔒 Fenced In</div>' : pad.fenced === false ? '<div class="detail-amenity" style="opacity:0.5">🔓 Not Fenced</div>' : '<div class="detail-amenity" style="opacity:0.5">🔒 Fencing Unknown</div>'}
-        ${pad.restrooms === true ? '<div class="detail-amenity">🚻 Restrooms</div>' : pad.restrooms === false ? '<div class="detail-amenity" style="opacity:0.5">🚫 No Restrooms</div>' : '<div class="detail-amenity" style="opacity:0.5">🚻 Restrooms Unknown</div>'}
-        ${pad.shade === true ? '<div class="detail-amenity">🌳 Shade Available</div>' : pad.shade === false ? '<div class="detail-amenity" style="opacity:0.5">☀️ No Shade</div>' : ''}
-        ${pad.toddler ? '<div class="detail-amenity">👶 Toddler Friendly</div>' : ''}
-        ${pad.parking ? '<div class="detail-amenity">🅿️ Free Parking</div>' : ''}
-        <div class="detail-amenity">🌊 Park Adjacent</div>
-      </div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">About This Park</div>
-      <div style="background:#fff;border-radius:12px;padding:14px;border:1.5px solid var(--border);font-size:14px;line-height:1.6;color:var(--text);font-weight:600;">${pad.notes}</div>
-    </div>
-    <button class="directions-btn" onclick="getDirections(${pad.id})">🗺️ Get Directions</button>`;
-  document.getElementById('detailOverlay').classList.add('visible');
+function openDetail(id){
+  const pad=splashPads.find(p=>p.id===id);
+  if(!pad) return;
+  document.getElementById('detailName').textContent=pad.name;
+  document.getElementById('detailCity').textContent='📍 '+pad.city+', IL · '+pad.county;
+  document.getElementById('detailBody').innerHTML=
+    '<div class="detail-section"><div class="detail-section-title">Hours & Season</div>'
+    +'<div class="detail-row"><span class="d-icon" aria-hidden="true">🕐</span><span class="d-label">Hours</span><span class="d-value">'+pad.hours+'</span></div>'
+    +'<div class="detail-row"><span class="d-icon" aria-hidden="true">📅</span><span class="d-label">Season</span><span class="d-value">'+pad.season+'</span></div>'
+    +'<div class="detail-row"><span class="d-icon" aria-hidden="true">👦</span><span class="d-label">Ages</span><span class="d-value">'+pad.ageRange+'</span></div>'
+    +'<div class="detail-row"><span class="d-icon" aria-hidden="true">💵</span><span class="d-label">Cost</span><span class="d-value" style="color:'+(pad.free?'#2a7a4f':'#8a5a00')+'">'+(pad.free?'Free':'Paid')+'</span></div></div>'
+    +'<div class="detail-section"><div class="detail-section-title">Amenities</div><div class="amenities">'
+    +(pad.fenced===true?'<div class="amenity">🔒 Fenced In</div>':pad.fenced===false?'<div class="amenity" style="opacity:0.5">🔓 Not Fenced</div>':'<div class="amenity" style="opacity:0.5">🔒 Fencing Unknown</div>')
+    +(pad.restrooms===true?'<div class="amenity">🚻 Restrooms</div>':pad.restrooms===false?'<div class="amenity" style="opacity:0.5">🚫 No Restrooms</div>':'<div class="amenity" style="opacity:0.5">🚻 Restrooms Unknown</div>')
+    +(pad.shade===true?'<div class="amenity">🌳 Shade</div>':pad.shade===false?'<div class="amenity" style="opacity:0.5">☀️ No Shade</div>':'')
+    +(pad.toddler?'<div class="amenity">👶 Toddler Friendly</div>':'')
+    +(pad.parking?'<div class="amenity">🅿️ Free Parking</div>':'')
+    +'<div class="amenity">🌊 Park Adjacent</div></div></div>'
+    +'<div class="detail-section"><div class="detail-section-title">About This Park</div><div class="about-text">'+pad.notes+'</div></div>'
+    +'<button class="dir-btn" onclick="getDirections('+pad.id+')" aria-label="Get directions to '+pad.name+'">🗺️ Get Directions</button>';
+  const overlay=document.getElementById('detailOverlay');
+  overlay.classList.add('visible');
+  overlay.querySelector('.detail-close').focus();
 }
 
-function closeDetail(e) { if (e.target === document.getElementById('detailOverlay')) document.getElementById('detailOverlay').classList.remove('visible'); }
-function closeDetailBtn() { document.getElementById('detailOverlay').classList.remove('visible'); }
-function getDirections(id) {
-  const pad = splashPads.find(p => p.id === id);
-  if (pad) window.open(`https://maps.google.com/?q=${encodeURIComponent(pad.address)}`, '_blank');
+function closeDetail(e){if(e.target===document.getElementById('detailOverlay')) document.getElementById('detailOverlay').classList.remove('visible');}
+function closeDetailBtn(){document.getElementById('detailOverlay').classList.remove('visible');}
+function getDirections(id){
+  const pad=splashPads.find(p=>p.id===id);
+  if(pad) window.open('https://maps.google.com/?q='+encodeURIComponent(pad.address),'_blank','noopener');
 }
 
-function init() {
-  const listEl = document.getElementById('padList');
-  const mapListEl = document.getElementById('mapCardList');
-  countyOrder.forEach(county => {
-    const countyPads = splashPads.filter(p => p.county === county);
-    if (!countyPads.length) return;
-    const divId = `divider-${county.replace(/\s+/g, '-')}`;
-    const divider = `<div class="county-divider" id="${divId}"><span>${county}</span></div>`;
-    listEl.innerHTML += divider;
-    mapListEl.innerHTML += divider.replace(divId, `map-${divId}`);
-    countyPads.forEach(pad => {
-      listEl.innerHTML += renderCard(pad);
-      mapListEl.innerHTML += `<div id="map-card-${pad.id}">${renderCard(pad, 'map-')}</div>`;
+function buildMap(){
+  const container=document.getElementById('mapContainer');
+  countyOrder.forEach(county=>{
+    const pads=splashPads.filter(p=>p.county===county);
+    if(!pads.length) return;
+    const cities=[...new Set(pads.map(p=>p.city))];
+    cities.forEach(city=>{
+      const cityPads=pads.filter(p=>p.city===city);
+      const group=document.createElement('div');
+      group.className='map-city-group';
+      group.setAttribute('role','region');
+      group.setAttribute('aria-label',city+' splash pads');
+      group.innerHTML='<div class="map-city-header">📍 '+city+' <span class="map-county-label">· '+county+'</span></div>'
+        +cityPads.map(p=>'<div class="map-row"><div class="map-info"><div class="map-name">'+p.name+'</div><div class="map-address">'+p.address+'</div></div>'
+        +'<button class="map-btn" onclick="window.open(\'https://maps.google.com/?q='+encodeURIComponent(p.address)+'\',\'_blank\',\'noopener\')" aria-label="Get directions to '+p.name+'">🗺️ Go</button></div>').join('');
+      container.appendChild(group);
     });
   });
+}
+
+function init(){
+  const listEl=document.getElementById('padList');
+  countyOrder.forEach(county=>{
+    const pads=splashPads.filter(p=>p.county===county);
+    if(!pads.length) return;
+    const divId='div-'+county.replace(/\s+/g,'-');
+    listEl.innerHTML+='<div class="county-divider" id="'+divId+'" role="separator" aria-label="'+county+'"><span>'+county+'</span></div>';
+    pads.forEach(pad=>{listEl.innerHTML+=renderCard(pad);});
+  });
   filterPads();
+  buildMap();
 }
 
 init();
